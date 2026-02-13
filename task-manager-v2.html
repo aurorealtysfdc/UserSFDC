@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .demo-credentials {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .demo-credentials strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #667eea;
+        }
+
+        /* Main App */
+        .app-container {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: none;
+        }
+
+        .app-container.show {
+            display: block;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px 0;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .user-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #764ba2;
+            color: white;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            color: #333;
+        }
+
+        .nav-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-content h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .stat-content .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .stat-icon.blue { background: #e0e7ff; }
+        .stat-icon.green { background: #d1fae5; }
+        .stat-icon.orange { background: #fed7aa; }
+        .stat-icon.purple { background: #e9d5ff; }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            max-height: 300px;
+        }
+
+        /* Tasks Table */
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group select {
+            padding: 10px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .filter-info {
+            margin-left: auto;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-in-progress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+        }
+
+        .icon-btn.edit {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+
+        .icon-btn.save {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .icon-btn.cancel {
+            background: #fee;
+            color: #dc2626;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Admin Panel */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .admin-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .admin-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .admin-card h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .admin-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .admin-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .admin-btn.purple {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+        }
+
+        .admin-btn.blue {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+        }
+
+        .admin-btn.green {
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #e5e7eb;
+            color: #666;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .list-item-info h4 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .list-item-info p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .view-content {
+            display: none;
+        }
+
+        .view-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="login-icon">🔒</div>
+                <h1 class="login-title">Task Manager</h1>
+                <p class="login-subtitle">Sign in to continue</p>
+            </div>
+            
+            <div id="loginError" class="error-message"></div>
+            
+            <div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter username" autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
+                </div>
+                
+                <button type="button" class="btn" id="loginBtn">Sign In</button>
+            </div>
+            
+            <div class="demo-credentials">
+                <strong>Demo Credentials:</strong>
+                <div>Super Admin: prasanna / prasanna123</div>
+                <div>User: abhiram / abhiram123</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>Task Management System</h1>
+                    <div class="user-info">
+                        Welcome, <strong id="userName"></strong>
+                        <span id="userBadge" class="badge hidden">SUPER ADMIN</span>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-bar">
+            <div class="nav-content">
+                <button class="nav-btn active" data-view="dashboard">📊 Dashboard</button>
+                <button class="nav-btn" data-view="tasks">✓ Tasks</button>
+                <button id="adminNavBtn" class="nav-btn hidden" data-view="admin">⚙️ Admin Panel</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <div id="dashboardView" class="view-content active">
+                <div class="section-header">
+                    <h2 class="section-title">Weekly Analytics Dashboard</h2>
+                    <span style="color: #666;">📅 Last 7 days</span>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <h3>Total Tasks</h3>
+                            <div class="stat-value" id="totalTasks">0</div>
+                        </div>
+                        <div class="stat-icon blue">✓</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <h3>Completed</h3>
+                            <div class="stat-value" id="completedTasks" style="color: #10b981;">0</div>
+                        </div>
+                        <div class="stat-icon green">✔</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <h3>Pending</h3>
+                            <div class="stat-value" id="pendingTasks" style="color: #f59e0b;">0</div>
+                        </div>
+                        <div class="stat-icon orange">⏱</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <h3>Completion Rate</h3>
+                            <div class="stat-value" id="completionRate" style="color: #6366f1;">0%</div>
+                        </div>
+                        <div class="stat-icon purple">📈</div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3 class="chart-title">Status Distribution</h3>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3 class="chart-title">Tasks by Project</h3>
+                        <canvas id="projectChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3 class="chart-title">Pending Tasks by Person</h3>
+                        <canvas id="pendingChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3 class="chart-title">Daily Activity (Last 7 Days)</h3>
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks View -->
+            <div id="tasksView" class="view-content">
+                <div class="section-header">
+                    <h2 class="section-title">Task Management</h2>
+                    <button id="addTaskBtn" class="admin-btn green hidden">+ Add Task</button>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <span>🔍</span>
+                        <select id="projectFilter">
+                            <option value="all">All Projects</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="statusFilter">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="in-progress">In Progress</option>
+                        </select>
+                    </div>
+                    <div class="filter-info">
+                        Showing <span id="filteredCount">0</span> of <span id="totalCount">0</span> tasks
+                    </div>
+                </div>
+
+                <!-- Tasks Table -->
+                <div class="table-container">
+                    <table id="tasksTable">
+                        <thead>
+                            <tr id="tableHeader"></tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Admin View -->
+            <div id="adminView" class="view-content">
+                <div class="section-header">
+                    <h2 class="section-title">Super Admin Panel</h2>
+                </div>
+
+                <div class="admin-grid">
+                    <div class="admin-card">
+                        <div class="admin-icon purple">👤</div>
+                        <h3>Add New User</h3>
+                        <p>Create new user accounts with specific roles</p>
+                        <button class="admin-btn purple" onclick="showAddUserModal()">Add User</button>
+                    </div>
+                    <div class="admin-card">
+                        <div class="admin-icon blue">📊</div>
+                        <h3>Add New Column</h3>
+                        <p>Extend task schema with custom fields</p>
+                        <button class="admin-btn blue" onclick="showAddColumnModal()">Add Column</button>
+                    </div>
+                    <div class="admin-card">
+                        <div class="admin-icon green">✓</div>
+                        <h3>Add New Task</h3>
+                        <p>Create new task entries in the system</p>
+                        <button class="admin-btn green" onclick="showAddTaskModal()">Add Task</button>
+                    </div>
+                </div>
+
+                <!-- Current Users -->
+                <div class="chart-card">
+                    <h3 class="chart-title">Current Users</h3>
+                    <div id="usersList"></div>
+                </div>
+
+                <!-- Current Columns -->
+                <div class="chart-card">
+                    <h3 class="chart-title">Task Columns</h3>
+                    <div id="columnsList"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-header">Add New User</h3>
+            <input type="text" id="newUsername" placeholder="Username">
+            <input type="text" id="newDisplayName" placeholder="Display Name">
+            <input type="password" id="newPassword" placeholder="Password">
+            <select id="newUserRole">
+                <option value="user">User</option>
+                <option value="superadmin">Super Admin</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="addUser()">Add User</button>
+                <button class="modal-btn secondary" onclick="closeModal('addUserModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addColumnModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-header">Add New Column</h3>
+            <input type="text" id="newColumnKey" placeholder="Column Key (e.g., priority)">
+            <input type="text" id="newColumnLabel" placeholder="Column Label (e.g., Priority)">
+            <select id="newColumnType">
+                <option value="text">Text</option>
+                <option value="number">Number</option>
+                <option value="date">Date</option>
+                <option value="textarea">Textarea</option>
+                <option value="select">Select</option>
+            </select>
+            <label>
+                <input type="checkbox" id="newColumnEditable" checked> Editable
+            </label>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="addColumn()">Add Column</button>
+                <button class="modal-btn secondary" onclick="closeModal('addColumnModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addTaskModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-header">Add New Task</h3>
+            <div id="newTaskForm"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="addTask()">Add Task</button>
+                <button class="modal-btn secondary" onclick="closeModal('addTaskModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Variables
+        let currentUser = null;
+        let tasks = [
+            {"id":1,"sno":1,"project":"All","task":"2nd reminder letters","description":"trigger 2nd reminder letters to missed customers","status":"pending","receivedFrom":"gopi and malhar","dateCreated":"2025-12-25","pendingWith":"arun","dateCompleted":""},
+            {"id":2,"sno":2,"project":"All","task":"Opportunity lock","description":"freeze opportunity registered units","status":"pending","receivedFrom":"Rama sir","dateCreated":"2025-12-25","pendingWith":"me","dateCompleted":""},
+            {"id":3,"sno":3,"project":"regent","task":"gre issue","description":"new project gre leads not getting submitted","status":"pending","receivedFrom":"indu","dateCreated":"2025-12-25","pendingWith":"raj","dateCompleted":""},
+            {"id":4,"sno":4,"project":"sansa","task":"dashboard enhancements","description":"dashboard enhancements","status":"pending","receivedFrom":"dilip","dateCreated":"2025-12-25","pendingWith":"dilip","dateCompleted":""},
+            {"id":5,"sno":5,"project":"sansa","task":"gre issue","description":"7893777737 number is not submitting as lead","status":"pending","receivedFrom":"kishore","dateCreated":"2025-12-25","pendingWith":"raj","dateCompleted":""},
+            {"id":6,"sno":6,"project":"pearl","task":"car parking adding","description":"Please add amount 20,00,00 (4 car parks)(Stellar701,Belon2302,Duxbury2001)","status":"completed","receivedFrom":"shareef","dateCreated":"2025-12-25","pendingWith":"-","dateCompleted":"2025-12-25"},
+            {"id":7,"sno":7,"project":"sansa","task":"Final Reminder trigger to Customer","description":"Final Reminder trigger to Customer","status":"pending","receivedFrom":"gopi","dateCreated":"2025-12-25","pendingWith":"arun","dateCompleted":""}
+        ];
+
+        let columns = [
+            {key: 'sno', label: 'S.No', type: 'number', editable: false},
+            {key: 'project', label: 'Project', type: 'text', editable: true},
+            {key: 'task', label: 'Task', type: 'text', editable: true},
+            {key: 'description', label: 'Task Description', type: 'textarea', editable: true},
+            {key: 'status', label: 'Status', type: 'select', options: ['pending', 'completed', 'in-progress'], editable: true},
+            {key: 'receivedFrom', label: 'Received from', type: 'text', editable: true},
+            {key: 'dateCreated', label: 'Date of created', type: 'date', editable: true},
+            {key: 'pendingWith', label: 'Pending with', type: 'text', editable: true},
+            {key: 'dateCompleted', label: 'Date of completed', type: 'date', editable: true}
+        ];
+
+        let users = {
+            prasanna: {username: 'prasanna', password: 'prasanna123', role: 'superadmin', displayName: 'Prasanna'},
+            abhiram: {username: 'abhiram', password: 'abhiram123', role: 'user', displayName: 'Abhiram'}
+        };
+
+        let editingTaskId = null;
+        let charts = {};
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            console.log('Page loaded, initializing...');
+            
+            // Login button
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.addEventListener('click', handleLogin);
+            
+            // Allow Enter key to submit
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            
+            // Navigation buttons
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const view = this.getAttribute('data-view');
+                    showView(view);
+                });
+            });
+            
+            // Filter changes
+            document.getElementById('projectFilter').addEventListener('change', applyFilters);
+            document.getElementById('statusFilter').addEventListener('change', applyFilters);
+            
+            // Add task button
+            document.getElementById('addTaskBtn').addEventListener('click', showAddTaskModal);
+            
+            console.log('Initialization complete');
+        });
+
+        // Login function
+        function handleLogin() {
+            console.log('Login button clicked');
+            const username = document.getElementById('username').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            console.log('Attempting login with username:', username);
+            
+            if (!username || !password) {
+                errorDiv.textContent = 'Please enter both username and password';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            if (users[username] && users[username].password === password) {
+                console.log('Login successful');
+                currentUser = users[username];
+                
+                // Hide login screen
+                document.getElementById('loginScreen').style.display = 'none';
+                
+                // Show main app
+                document.getElementById('mainApp').classList.add('show');
+                
+                // Set user name
+                document.getElementById('userName').textContent = currentUser.displayName;
+                
+                // Show admin features if superadmin
+                if (currentUser.role === 'superadmin') {
+                    document.getElementById('userBadge').classList.remove('hidden');
+                    document.getElementById('adminNavBtn').classList.remove('hidden');
+                    document.getElementById('addTaskBtn').classList.remove('hidden');
+                }
+                
+                // Load data and show dashboard
+                loadData();
+                showView('dashboard');
+            } else {
+                console.log('Login failed');
+                errorDiv.textContent = 'Invalid username or password';
+                errorDiv.classList.add('show');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            currentUser = null;
+            document.getElementById('mainApp').classList.remove('show');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('userBadge').classList.add('hidden');
+            document.getElementById('adminNavBtn').classList.add('hidden');
+            document.getElementById('addTaskBtn').classList.add('hidden');
+        }
+
+        // Load Data
+        function loadData() {
+            const stored = localStorage.getItem('tasks');
+            if (stored) tasks = JSON.parse(stored);
+            
+            const storedColumns = localStorage.getItem('columns');
+            if (storedColumns) columns = JSON.parse(storedColumns);
+            
+            const storedUsers = localStorage.getItem('users');
+            if (storedUsers) users = JSON.parse(storedUsers);
+            
+            updateProjectFilter();
+        }
+
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function saveColumns() {
+            localStorage.setItem('columns', JSON.stringify(columns));
+        }
+
+        function saveUsers() {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        // Navigation
+        function showView(view) {
+            // Hide all views
+            document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+            // Remove active from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            // Show selected view
+            document.getElementById(view + 'View').classList.add('active');
+            
+            // Activate nav button
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-view') === view) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Load view-specific content
+            if (view === 'dashboard') updateDashboard();
+            if (view === 'tasks') {
+                renderTable();
+                applyFilters();
+            }
+            if (view === 'admin') renderAdmin();
+        }
+
+        // Dashboard
+        function updateDashboard() {
+            const total = tasks.filter(t => t.project).length;
+            const completed = tasks.filter(t => t.status === 'completed').length;
+            const pending = tasks.filter(t => t.status === 'pending').length;
+            const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('pendingTasks').textContent = pending;
+            document.getElementById('completionRate').textContent = rate + '%';
+            
+            setTimeout(renderCharts, 100);
+        }
+
+        function renderCharts() {
+            // Status Chart
+            const statusCounts = {};
+            tasks.forEach(t => {
+                if (t.project) statusCounts[t.status] = (statusCounts[t.status] || 0) + 1;
+            });
+            
+            if (charts.status) charts.status.destroy();
+            const statusCtx = document.getElementById('statusChart');
+            if (statusCtx) {
+                charts.status = new Chart(statusCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(statusCounts).map(k => k.charAt(0).toUpperCase() + k.slice(1)),
+                        datasets: [{
+                            data: Object.values(statusCounts),
+                            backgroundColor: ['#f59e0b', '#10b981', '#3b82f6']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+            
+            // Project Chart
+            const projectCounts = {};
+            tasks.forEach(t => {
+                if (t.project) projectCounts[t.project] = (projectCounts[t.project] || 0) + 1;
+            });
+            
+            if (charts.project) charts.project.destroy();
+            const projectCtx = document.getElementById('projectChart');
+            if (projectCtx) {
+                charts.project = new Chart(projectCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(projectCounts),
+                        datasets: [{
+                            label: 'Tasks',
+                            data: Object.values(projectCounts),
+                            backgroundColor: '#6366f1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Pending by Person
+            const pendingCounts = {};
+            tasks.filter(t => t.status === 'pending' && t.pendingWith && t.pendingWith !== '-').forEach(t => {
+                pendingCounts[t.pendingWith] = (pendingCounts[t.pendingWith] || 0) + 1;
+            });
+            
+            if (charts.pending) charts.pending.destroy();
+            const pendingCtx = document.getElementById('pendingChart');
+            if (pendingCtx && Object.keys(pendingCounts).length > 0) {
+                charts.pending = new Chart(pendingCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(pendingCounts),
+                        datasets: [{
+                            label: 'Pending Tasks',
+                            data: Object.values(pendingCounts),
+                            backgroundColor: '#f59e0b'
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Activity Chart
+            const today = new Date();
+            const dailyData = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const created = tasks.filter(t => t.dateCreated === dateStr).length;
+                const completed = tasks.filter(t => t.dateCompleted === dateStr).length;
+                dailyData.push({ date: dateStr.slice(5), created, completed });
+            }
+            
+            if (charts.activity) charts.activity.destroy();
+            const activityCtx = document.getElementById('activityChart');
+            if (activityCtx) {
+                charts.activity = new Chart(activityCtx, {
+                    type: 'line',
+                    data: {
+                        labels: dailyData.map(d => d.date),
+                        datasets: [
+                            {
+                                label: 'Created',
+                                data: dailyData.map(d => d.created),
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Completed',
+                                data: dailyData.map(d => d.completed),
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Tasks Table
+        function renderTable() {
+            const header = document.getElementById('tableHeader');
+            header.innerHTML = columns.map(col => `<th>${col.label}</th>`).join('') + '<th>Actions</th>';
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const projectFilter = document.getElementById('projectFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            const filtered = tasks.filter(t => {
+                if (!t.project) return false;
+                const projectMatch = projectFilter === 'all' || t.project === projectFilter;
+                const statusMatch = statusFilter === 'all' || t.status === statusFilter;
+                return projectMatch && statusMatch;
+            });
+            
+            document.getElementById('filteredCount').textContent = filtered.length;
+            document.getElementById('totalCount').textContent = tasks.filter(t => t.project).length;
+            
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = filtered.map(task => `
+                <tr id="row-${task.id}">
+                    ${columns.map(col => `
+                        <td>
+                            ${editingTaskId === task.id && col.editable ? renderEditField(task, col) : renderDisplayField(task, col)}
+                        </td>
+                    `).join('')}
+                    <td>
+                        <div class="action-buttons">
+                            ${editingTaskId === task.id ? `
+                                <button class="icon-btn save" onclick="saveTask(${task.id})">💾</button>
+                                <button class="icon-btn cancel" onclick="cancelEdit()">✕</button>
+                            ` : `
+                                <button class="icon-btn edit" onclick="editTask(${task.id})">✏️</button>
+                            `}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderEditField(task, col) {
+            const value = task[col.key] || '';
+            if (col.type === 'textarea') {
+                return `<textarea id="edit-${col.key}" rows="2" style="width: 100%; padding: 8px;">${value}</textarea>`;
+            } else if (col.type === 'select') {
+                return `<select id="edit-${col.key}" style="width: 100%; padding: 8px;">
+                    ${col.options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                </select>`;
+            } else {
+                return `<input type="${col.type}" id="edit-${col.key}" value="${value}" style="width: 100%; padding: 8px;">`;
+            }
+        }
+
+        function renderDisplayField(task, col) {
+            const value = task[col.key] || '-';
+            if (col.key === 'status') {
+                return `<span class="status-badge status-${value}">${value}</span>`;
+            } else if (col.type === 'textarea') {
+                return `<div style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;" title="${value}">${value}</div>`;
+            }
+            return value;
+        }
+
+        function editTask(id) {
+            editingTaskId = id;
+            applyFilters();
+        }
+
+        function cancelEdit() {
+            editingTaskId = null;
+            applyFilters();
+        }
+
+        function saveTask(id) {
+            const task = tasks.find(t => t.id === id);
+            columns.forEach(col => {
+                if (col.editable) {
+                    const input = document.getElementById(`edit-${col.key}`);
+                    if (input) task[col.key] = input.value;
+                }
+            });
+            saveTasks();
+            editingTaskId = null;
+            applyFilters();
+            updateDashboard();
+        }
+
+        function updateProjectFilter() {
+            const projects = [...new Set(tasks.filter(t => t.project).map(t => t.project))];
+            const select = document.getElementById('projectFilter');
+            select.innerHTML = '<option value="all">All Projects</option>' + 
+                projects.map(p => `<option value="${p}">${p}</option>`).join('');
+        }
+
+        // Admin Functions
+        function renderAdmin() {
+            // Render users list
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = Object.values(users).map(user => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <h4>${user.displayName}</h4>
+                        <p>@${user.username}</p>
+                    </div>
+                    <span class="status-badge ${user.role === 'superadmin' ? 'status-completed' : 'status-in-progress'}">
+                        ${user.role}
+                    </span>
+                </div>
+            `).join('');
+            
+            // Render columns list
+            const columnsList = document.getElementById('columnsList');
+            columnsList.innerHTML = columns.map(col => `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <h4>${col.label}</h4>
+                        <p>Key: ${col.key} • Type: ${col.type}</p>
+                    </div>
+                    <span class="status-badge ${col.editable ? 'status-completed' : 'status-pending'}">
+                        ${col.editable ? 'Editable' : 'Read-only'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function showAddUserModal() {
+            document.getElementById('addUserModal').classList.add('show');
+        }
+
+        function showAddColumnModal() {
+            document.getElementById('addColumnModal').classList.add('show');
+        }
+
+        function showAddTaskModal() {
+            const form = document.getElementById('newTaskForm');
+            form.innerHTML = columns.filter(col => col.key !== 'sno' && col.key !== 'id').map(col => `
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">${col.label}</label>
+                ${col.type === 'textarea' ? 
+                    `<textarea id="new-${col.key}"></textarea>` :
+                    col.type === 'select' ?
+                    `<select id="new-${col.key}">
+                        <option value="">Select...</option>
+                        ${col.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                    </select>` :
+                    `<input type="${col.type}" id="new-${col.key}">`
+                }
+            `).join('');
+            document.getElementById('addTaskModal').classList.add('show');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function addUser() {
+            const username = document.getElementById('newUsername').value.toLowerCase().trim();
+            const displayName = document.getElementById('newDisplayName').value.trim();
+            const password = document.getElementById('newPassword').value;
+            const role = document.getElementById('newUserRole').value;
+            
+            if (!username || !displayName || !password) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            users[username] = { username, displayName, password, role };
+            saveUsers();
+            closeModal('addUserModal');
+            renderAdmin();
+            alert('User added successfully!');
+            
+            // Clear form
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newDisplayName').value = '';
+            document.getElementById('newPassword').value = '';
+        }
+
+        function addColumn() {
+            const key = document.getElementById('newColumnKey').value.trim();
+            const label = document.getElementById('newColumnLabel').value.trim();
+            const type = document.getElementById('newColumnType').value;
+            const editable = document.getElementById('newColumnEditable').checked;
+            
+            if (!key || !label) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            if (columns.find(col => col.key === key)) {
+                alert('Column key already exists');
+                return;
+            }
+            
+            const newCol = { key, label, type, editable };
+            if (type === 'select') newCol.options = ['pending', 'completed', 'in-progress'];
+            
+            columns.push(newCol);
+            saveColumns();
+            
+            tasks.forEach(task => task[key] = '');
+            saveTasks();
+            
+            closeModal('addColumnModal');
+            renderAdmin();
+            alert('Column added successfully!');
+            
+            // Clear form
+            document.getElementById('newColumnKey').value = '';
+            document.getElementById('newColumnLabel').value = '';
+        }
+
+        function addTask() {
+            const nextId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+            const nextSno = tasks.length > 0 ? Math.max(...tasks.map(t => t.sno)) + 1 : 1;
+            
+            const newTask = { id: nextId, sno: nextSno };
+            columns.forEach(col => {
+                if (col.key !== 'sno' && col.key !== 'id') {
+                    const input = document.getElementById(`new-${col.key}`);
+                    newTask[col.key] = input ? input.value : '';
+                }
+            });
+            
+            tasks.push(newTask);
+            saveTasks();
+            closeModal('addTaskModal');
+            updateProjectFilter();
+            applyFilters();
+            updateDashboard();
+            alert('Task added successfully!');
+        }
+    </script>
+</body>
+</html>
